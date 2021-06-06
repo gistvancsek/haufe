@@ -22,10 +22,11 @@ const init = async () => {
         method: 'GET',
         path: '/mongo-status',
         handler: (request, h) => {
-            if(mongoClient.isConnected()){
-                return 'MongoDB connected successfully!';
+            if (mongoClient.isConnected()) {
+                return h.response({message: 'MongoDB connected successfully!'}).code(200);
+            } else {
+                return h.response({message: 'MongoDB connected failed!'}).code(500);
             }
-            return 'MongoDB connected failed!'
         }
     });
 
