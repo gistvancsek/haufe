@@ -69,14 +69,43 @@ exports.plugin = {
                 const doc = {email: 'email_' + Math.floor(Math.random() * 999) + '@domain.com'};
                 const result = await usersCollection.insertOne(doc);
                 console.log(`Inserted document with _id: ${result.insertedId}`);
-                if(result.insertedId !== 'undefined'){
-                    return h.response({statusCode: '200', id: result.insertedId, email: doc.email, message: 'User inserted successfully'}).code(200);
+                if (result.insertedId !== 'undefined') {
+                    return h.response({
+                        statusCode: '200',
+                        id: result.insertedId,
+                        email: doc.email,
+                        message: 'User inserted successfully'
+                    }).code(200);
                 } else {
                     return h.response({statusCode: '500', message: 'An error occurred'}).code(500);
                 }
             }
         });
 
+        server.route({
+            method: 'GET',
+            path: '/time-agg',
+            handler: async (request, h) => {
+                const adminDb = mongoClient.db('admin');
+                const usersCollection = adminDb.collection('users');
+                const dateStart = new Date();
+                const pipeline = [{$match: {"email": /.+0.+/}}, {$sort: {_id: -1}}, {
+                    $group: {
+                        _id: null,
+                        count: {$sum: 1}
+                    }
+                }]
+                const aggCursor = await usersCollection.aggregate(pipeline);
+                const dateStop = new Date();
+                await aggCursor.forEach(entry => {
+                    console.log(`Total documents which contains '0': ${entry.count}`);
+                });
+                return h.response({
+                    statusCode: '200',
+                    message: 'Agg took ' + (dateStop - dateStart) + ' ms'
+                }).code(200);
+            }
+        });
 
     }
 };
