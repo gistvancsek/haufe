@@ -1,5 +1,5 @@
 'use strict';
-const mongoConnectionUrl = "mongodb://mongodb:27017/users";
+const mongoConnectionUrl = "mongodb://mongodb:27017/admin";
 global.mongoClient = require('mongodb').MongoClient(mongoConnectionUrl);
 const Hapi = require('@hapi/hapi');
 
